@@ -51,6 +51,10 @@ side of things, so don't worry if you see the following for a while (10 minutes 
 > modeule.cluster.module.aws.aws_eks_cluster.cluster: Still creating... [6m10s elapsed]  
 > ...
 
+If CoreDNS takes too long to start up on the first try, simply retry the 'terraform apply' (without destroying first).
+CoreDNS has a tendency not to know when it is successfully deployed, so the second attempt should just pick up the
+current state and continue where it would have left off if CoreDNS hadn't timed out.
+
 ### Connecting to your Cluster
 Once everything is finished being created, you can see your cluster through kubectl by updating your kubeconfig:
 
