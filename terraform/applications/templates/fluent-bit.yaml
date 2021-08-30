@@ -1,0 +1,67 @@
+# Template out the image version and service account name to use so that they can be modified from Terraform.
+image:
+  tag: ${image_version}
+
+serviceAccount:
+  name: ${service_account_name}
+
+# Tolerate all taints so that all nodes are logged.
+tolerations:
+  - key: ""
+    operator: "Exists"
+    effect: "NoExecute"
+
+# Pipeline configuration.
+config:
+  # This is a config for the FluentBit application running the pipeline.
+  # We set the flush interval, log level and where our parsers are stored.
+  # We additionally expose the HTTP service so that Terraform can ping it.
+  service: |
+    [SERVICE]
+        Flush        2
+        Daemon       Off
+        Log_Level    info
+        Parsers_File parsers.conf
+        HTTP_Server  On
+        HTTP_Listen  0.0.0.0
+        HTTP_Port    {{ .Values.service.port }}
+
+  # We read all of the logs for output by docker's json file logging engine.
+  # Every line appended to a file that matches the Path field will generate a record in the pipeline.
+  inputs: |
+    [INPUT]
+        Name             tail
+        Tag              applications.*
+        Parser           docker
+        Path             /var/log/containers/*.log
+        Skip_Long_Lines  on
+        Mem_Buf_Limit    5MB
+        Refresh_Interval 2
+
+  # Grep Filter drops logs that are only whitespace.
+  # Kubernetes Filter appends K8s information to all outgoing logs.
+  filters: |
+    [FILTER]
+        Name  grep
+        Match applications.*
+        Tag   filtered.*
+        Regex $log (.|\s)*\S(.|\s)*
+    [FILTER]
+        Name                kubernetes
+        Match               filtered.*
+        Tag                 kube.*
+        Kube_Tag_Prefix     filtered.applications.var.log.containers.
+        Kube_URL            https://kubernetes.default.svc.cluster.local:443
+        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+        Merge_Log           On
+
+  # We output the logs coming out of the Kubernetes Filter to Cloudwatch.
+  outputs: |
+    [OUTPUT]
+        Name              cloudwatch_logs
+        Match             kube.*
+        Region            ${region}
+        Log_Group_Name    /test/logs
+        Log_Stream_Prefix test-
+        Auto_Create_Group On
