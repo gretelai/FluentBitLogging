@@ -16,7 +16,7 @@ variable "node_count" {
 variable "node_type" {
   type        = string
   description = "The type of EC2 instance to use for our nodes."
-  default = "m4.large"
+  default = "m4.medium"
 }
 
 variable "dummy_namespace" {
@@ -52,6 +52,26 @@ output "ca" {
 output "cluster_token" {
   description = "Role to use when creating our applications in the cluster."
   value = module.aws.cluster_token
+}
+
+output "dummy_namespace" {
+  description = "Name of the namespace created to hold out dummy application."
+  value = module.kubernetes.dummy_namespace
+}
+
+output "dummy_service_account" {
+  description = "Name of the service account erted to run out dummy application."
+  value = module.kubernetes.dummy_service_account
+}
+
+output "logging_namespace" {
+  description = "Name of the namespace created to hold our logging application."
+  value = module.kubernetes.logging_namespace
+}
+
+output "logging_service_account" {
+  description = "Name of the service account created to run our logging application."
+  value = module.kubernetes.logging_service_account
 }
 
 ##############################################################################################

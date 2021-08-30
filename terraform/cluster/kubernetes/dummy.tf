@@ -11,11 +11,9 @@ resource "kubernetes_namespace" "dummy_namespace" {
 }
 
 resource "kubernetes_network_policy" "dummy_network_policy" {
-  depends_on = [kubernetes_namespace.dummy_namespace]
-
   metadata {
     name = "${var.dummy_namespace}-network-policy"
-    namespace = var.dummy_namespace
+    namespace = kubernetes_namespace.dummy_namespace.metadata.0.name
   }
 
   spec {
@@ -33,7 +31,7 @@ resource "kubernetes_network_policy" "dummy_network_policy" {
 resource "kubernetes_service_account" "dummy_application" {
   metadata {
     name = "${var.dummy_namespace}-service-account"
-    namespace = var.dummy_namespace
+    namespace = kubernetes_namespace.dummy_namespace.metadata.0.name
     annotations = {
       "eks.amazonaws.com/role-arn" = var.dummy_role
     }

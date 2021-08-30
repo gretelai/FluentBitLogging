@@ -46,7 +46,26 @@ variable "logging_role" {
 # Outputs
 ##############################################################################################
 
-# None
+output "dummy_namespace" {
+  description = "Name of the namespace created to hold out dummy application."
+  value = kubernetes_namespace.dummy_namespace.metadata.0.name
+}
+
+output "dummy_service_account" {
+  description = "Name of the service account erted to run out dummy application."
+  value = kubernetes_service_account.dummy_application.metadata.0.name
+}
+
+output "logging_namespace" {
+  description = "Name of the namespace created to hold our logging application."
+  value = kubernetes_namespace.logging_namespace.metadata.0.name
+}
+
+output "logging_service_account" {
+  description = "Name of the service account created to run our logging application."
+  value = kubernetes_service_account.logging_service_account.metadata.0.name
+}
+
 
 ##############################################################################################
 # Module

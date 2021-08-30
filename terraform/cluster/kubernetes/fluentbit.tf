@@ -11,11 +11,9 @@ resource "kubernetes_namespace" "logging_namespace" {
 }
 
 resource "kubernetes_network_policy" "logging_network_policy" {
-  depends_on = [kubernetes_namespace.logging_namespace]
-
   metadata {
     name = "${var.logging_namespace}-network-policy"
-    namespace = var.logging_namespace
+    namespace = kubernetes_namespace.logging_namespace.metadata.0.name
   }
 
   spec {
@@ -36,8 +34,13 @@ resource "kubernetes_network_policy" "logging_network_policy" {
 resource "kubernetes_service_account" "logging_service_account" {
   metadata {
     name = "${var.logging_namespace}-service-account"
-    namespace = var.logging_namespace
+    namespace = kubernetes_namespace.logging_namespace.metadata.0.name
+    labels = {
+      "app.kubernetes.io/managed-by" = "Helm"
+    }
     annotations = {
+      "meta.helm.sh/release-namespace" = kubernetes_namespace.logging_namespace.metadata.0.name
+      "meta.helm.sh/release-name" = "fluent-bit"
       "eks.amazonaws.com/role-arn" = var.logging_role
     }
   }

@@ -45,12 +45,12 @@ output "cluster_token" {
 
 output "dummy_role" {
   description = "Role to use when creating our applications in the cluster."
-  value = aws_iam_role.node_role.arn
+  value = aws_eks_node_group.node_group.node_role_arn
 }
 
 output "logging_role" {
   description = "Role to use when creating our applications in the cluster."
-  value = aws_iam_role.node_role.arn
+  value = aws_eks_node_group.node_group.node_role_arn
 }
 
 ##############################################################################################

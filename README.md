@@ -61,7 +61,7 @@ Once everything is finished being created, you can see your cluster through kube
 
 ### Notes
 
-By Default this repository will create a single node Kubernetes cluster with machine type **t3.micro**. To change this,
+By Default this repository will create a single node Kubernetes cluster with machine type **t3.medium**. To change this,
 see the inputs in:
 
         cluster/aws/main.tf
@@ -102,31 +102,10 @@ local backend, but for production you will want to use a real remote persistence
         }
     }
 
-Next we will need to create some Data types, which give us access to some information we will need when creating our
-cluster.
-
-    # This loads the available AZs (Availability Zones).
-    data "aws_availability_zones" "available" {
-        state = "available"
-    }
-
-    # This loads the current region for the provider.
-    data "aws_region" "current" {}
-
-Now that we have our AWS context setup, we can create an EKS cluster using some AWS provided Resource types.
-
-    resource "aws_iam_role" "cluster-role" {
-    ...
-    }
-    
-    resource "aws_eks_cluster" "my-cluster" {
-        name     = "my-cluster"
-        role_arn = aws_iam_role.cluster-role.arn
-        
-        version = "1.20"
-    }
-
-This will get us to the point where we will have an EKS Kubernetes cluster available to use.
+Getting a usable EKS cluster set up through Terraform requires the use of many AWS Resource types. I suggest you dive
+into the documentation on 
+[AWS's Terraform Provider page](https://registry.terraform.io/providers/hashicorp/aws/latest/docs). This repository can
+be a good jump off point for knowing what to look at!
 
 ### What is Helm?
 

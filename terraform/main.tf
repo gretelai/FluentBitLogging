@@ -49,11 +49,11 @@ module "applications" {
 
   aws_region = data.aws_region.current.name
 
-  dummy_namespace = "dummies"
-  dummy_service_account = "dummy-service-account"
+  dummy_namespace = module.cluster.dummy_namespace
+  dummy_service_account = module.cluster.dummy_service_account
 
-  logging_namespace = "logging"
-  logging_service_account = "fluent-bit-svc-acct"
+  logging_namespace = module.cluster.logging_namespace
+  logging_service_account = module.cluster.logging_service_account
 
   cluster_endpoint = module.cluster.endpoint
   cluster_ca = module.cluster.ca
